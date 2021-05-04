@@ -1,0 +1,307 @@
+# What Makes Golang Go
+The Power of Go Interfaces
+04 May 2021
+Tags: go, golang, interfaces
+Summary: Go interfaces make your code flexible
+
+Ricardo Gerardi
+Powerful Command-Line Applications in Go, Author
+Senior Automation Consultant, Red Hat
+@ricardogerardi
+
+## Go and CLI Apps
+
+.background images/slide-back.png
+.html html/go-cli.html
+.caption _Go_ _Gopher_ (CC BY 3.0) original design by [[http://reneefrench.blogspot.com/][Renee French]]
+: Simplicity: No classes, no inheritance, no complications - less abstract
+: Go combines the reliability of statically typed compiled languages with the ease of use of dynamic languages
+: Productivity
+: No runtime dependencies - compiles to a single binary
+: Rapid prototyping - problems solved in the concrete space
+: Mention present software
+
+## Less is Exponentially More
+
+.background images/slide-back.png
+- Readable
+- Opinionated
+- Reduced set of features
+- Object Oriented, but...
+
+There are no:
+- Classes
+- Constructors
+- Inheritance (Type Hierarchy)
+- Method Overloading
+- Generics*
+
+## Interfaces
+
+.background images/title-back.png
+
+## Interfaces
+
+.background images/slide-back.png
+A way to enable seemingly incompatible entities to interact
+
+.image images/outlet.png 300 _
+
+- Specify a set of methods
+- Hide the implementation
+- Define a *contract*
+
+## Interfaces in Go
+
+.background images/slide-back.png
+The Abstract Type
+
+- Defines behaviour only
+- Implicitly satisfied
+- Small
+
+: Decouples definition from implementation
+
+## Concrete Types
+
+.background images/slide-back.png
+.code types/types.go
+
+: Concrete types only represent state, methods add behaviour
+
+## Defining Behaviour (Methods)
+
+.background images/slide-back.png
+.code methods/methods.go /Methods START OMIT/,/Methods END OMIT/
+
+: Methods can be implemented on any types, not only struct
+: Go allow methods to be attached to any data representation
+
+## Defining Interfaces
+
+.background images/slide-back.png
+.code methods/methods.go /type ForceUser/,/^}$/
+
+: Typical pattern - one method interfaces
+
+## Example
+
+.background images/slide-back.png
+.play print1/print.go
+
+## Example (cont.)
+
+.background images/slide-back.png
+.play -edit print2/print.go /START OMIT/,/END OMIT/
+
+: Emphasize String method - it's just the name + signature. No inheritance, overload, to_string, or super object.
+
+## fmt.Stringer Interface
+
+.background images/slide-back.png
+.code src/fmt/print.go /^// Stringer is implemented/,/^}$/
+
+: The Jedi type is not even  aware that such interface exists.
+: In fact, we can implement this in a separate package with no dependencies on fmt
+
+## Implicit Satisfaction - No dependencies
+
+.background images/slide-back.png
+.code print3/force/force.go
+
+: Highlight no "implements" keyword
+: No implements: no unnecessary package dependencies
+
+## Implicit Satisfaction - No dependencies (cont.)
+
+.background images/slide-back.png
+.play print3/print.go
+
+: Avoids circular dependencies
+
+## Small interfaces - powerful abstractions
+
+.background images/slide-back.png
+.play io.writer/file/main.go
+
+## io.Writer interface
+
+.background images/slide-back.png
+.code src/io/io.go /^// Writer is the interface/,/^}$/
+
+: Typical pattern - one method interfaces
+: One method interfaces name finishes in "er"
+
+## Require only what you need
+
+.background images/slide-back.png
+.play io.writer/writer/main.go
+
+## Small interfaces - Flexible implementation
+
+.background images/slide-back.png
+.play -edit io.writer/listener/main.go /START OMIT/,/END OMIT/
+
+## Small interfaces - Flexible implementation
+
+.background images/slide-back.png
+.play -edit io.writer/net/main.go
+
+: Emphasize that it works just because there's a method with the same name and signature. No "implements" keyword
+
+## Small interfaces - Extensive usage
+
+.background images/slide-back.png
+.play -edit io.writer/log/main.go /START OMIT/,/END OMIT/
+
+: No implements: light interface uses, commonly used. As opposed to used for heavy weight situations
+: Large interfaces require specifying methods that are not required
+
+## Testing
+
+.background images/title-back.png
+
+## How to test this code?
+
+.background images/slide-back.png
+.code testing/ex1/main.go /^func save/,/^}/
+.code -numbers testing/ex1/main_test.go /^func Test_Save/,/^}/
+
+## Interfaces Improve Testing
+
+.background images/slide-back.png
+.code  testing/ex2/main.go /^func save/,/^}/
+.code -numbers  testing/ex2/main_test.go /^func Test_Save/,/^}/
+
+    === RUN   Test_Save
+    --- PASS: Test_Save (0.00s)
+    PASS
+    ok      github.com/rgerardi/philly-ete-2021/testing/ex2 0.006s
+
+: Improves code readability and testing
+
+## Duck Typing
+
+.background images/title-back.png
+
+## Duck Typing
+
+.background images/slide-back.png
+"If it walks like a duck and it quacks like a duck, then it must be a duck"
+
+.link https://en.wikipedia.org/wiki/Duck_typing
+
+In Go:
+
+"If it walks like a duck and it quacks like a duck, then it BEHAVES like a duck"
+
+: Use behaviour to group elements. Creates complexity through behaviour
+: Like ducktyping but verified at compile time, preventing runtime errors
+
+## Example
+
+.background images/slide-back.png
+.code shape/shape/shape.go /STARTEX1 OMIT/,/ENDEX1 OMIT/
+
+## Example (cont.)
+
+.background images/slide-back.png
+.play -edit shape/ex1/main.go /START OMIT/,/END OMIT/
+
+: Polymorphism
+
+## Composition
+
+.background images/slide-back.png
+.play -edit shape/ex2/main.go /START OMIT/,/END OMIT/
+
+: Enable modeling complex scenarios via implicit composition
+: Inner type promotion - promotes fields and methods of embedded type
+: Inner type promotion - promoted methods satisfy interfaces
+
+## Composition is not inheritance
+
+.background images/slide-back.png
+.play -edit shape/ex3/main.go /START OMIT/,/END OMIT/
+
+: Promotion does not create relationship
+
+## Grouping through behaviour
+
+.background images/slide-back.png
+.play -edit shape/ex4/main.go /START OMIT/,/END OMIT/
+
+: Don't require to annotate source package (sometimes impossible) to use interface
+: No unnecessary type dependencies. No requirement for parent grouping type
+
+## Augmenting
+
+.background images/slide-back.png
+.code shape/shape/shape.go /package/,/$/
+.code shape/shape/shape.go /STARTEX5 OMIT/,/ENDEX5 OMIT/
+
+## You can only call methods from interface
+
+.background images/slide-back.png
+.play -edit shape/ex5/main.go /START OMIT/,/END OMIT/
+
+## Composing Interfaces
+
+.background images/slide-back.png
+.play -edit shape/ex6/main.go /START OMIT/,/END OMIT/
+
+: Interfaces are composable
+: In Go interfaces are implemented at the bottom, closer to the use
+: Allows to start with concrete and discover patterns that turn into interfaces
+
+## Extra
+
+.background images/title-back.png
+
+## Type Assertions
+
+.background images/slide-back.png
+.play -edit shape/ex7/main.go /START OMIT/,/END OMIT/
+
+## Type Switch
+
+.background images/slide-back.png
+.play -edit shape/ex8/main.go /START OMIT/,/END OMIT/
+
+## Empty Interface: interface{}
+
+.background images/slide-back.png
+
+- An interface that specifies no methods
+- Often misunderstood
+- Avoid using
+
+"The empty interface says nothing" (Rob Pike)
+
+.link https://go-proverbs.github.io/
+
+## Learn More
+
+.background images/slide-back.png
+.link https://tour.golang.org/methods/9
+.link https://jordanorelli.com/post/32665860244/how-to-use-interfaces-in-go
+.link https://research.swtch.com/interfaces
+.link https://golang.org/doc/effective_go#interfaces_and_types
+
+## Summary
+
+.background images/slide-back.png
+- Interfaces are one of the most powerful concepts in Go
+- Improve readability, re-usability, and testing
+- Implicitly satisfied interfaces increase flexibility
+- Allow modeling complex scenarios through behaviour
+
+: Enable building complex behaviours via implicit composition
+
+## Powerful Command-Line Applications in Go
+
+.background images/slide-back.png
+.image images/rggo.jpg _ 300
+.link https://pragprog.com/titles/rggo/powerful-command-line-applications-in-go/
+.link https://devtalk.com/books/powerful-command-line-applications-in-go
+

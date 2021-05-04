@@ -1,0 +1,1347 @@
+<!DOCTYPE html>
+<!-- saved from url=(0036)http://127.0.0.1:3999/preso.slide#10 -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>What Makes Golang Go</title>
+    
+    <script>
+      var notesEnabled =  false ;
+    </script>
+    <script src="./the_power_go_interfaces_files/slides.js"></script>
+
+    
+
+    <script>
+      
+      if (window["location"] && window["location"]["hostname"] == "talks.golang.org") {
+        var _gaq = _gaq || [];
+        _gaq.push(["_setAccount", "UA-11222381-6"]);
+        _gaq.push(["b._setAccount", "UA-49880327-6"]);
+        window.trackPageview = function() {
+          _gaq.push(["_trackPageview", location.pathname+location.hash]);
+          _gaq.push(["b._trackPageview", location.pathname+location.hash]);
+        };
+        window.trackPageview();
+        window.trackEvent = function(category, action, opt_label, opt_value, opt_noninteraction) {
+          _gaq.push(["_trackEvent", category, action, opt_label, opt_value, opt_noninteraction]);
+          _gaq.push(["b._trackEvent", category, action, opt_label, opt_value, opt_noninteraction]);
+        };
+      }
+    </script>
+  <meta name="viewport" content="width=device-width,height=device-height,initial-scale=1"><meta name="apple-mobile-web-app-capable" content="yes"></head>
+
+  <body style="display: none" class="loaded">
+
+    <section class="slides layout-widescreen" style="transform: scale(0.796);">
+
+      <article class="background" style="background-image: url(&#39;images/title-back.png&#39;)">
+        <h1>What Makes Golang Go</h1>
+        <h3>The Power of Go Interfaces</h3>
+        <h3>4 May 2021</h3>
+        
+          <div class="presenter">
+            
+  
+  <p>
+    Ricardo Gerardi
+  </p>
+  
+
+  
+  <p>
+    Powerful Command-Line Applications in Go, Author
+  </p>
+  
+
+  
+  <p>
+    Senior Automation Consultant, Red Hat
+  </p>
+  
+
+          </div>
+        
+      </article>
+
+  
+  
+      <article class="background" style="background-image: url(&#39;images/slide-back.png&#39;)">
+      
+        <h3>Go and CLI Apps</h3>
+        
+
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+* {
+  box-sizing: border-box;
+}
+
+/* Create two equal columns that floats next to each other */
+.column {
+  float: left;
+  width: 50%;
+  padding: 20px;
+}
+
+/* Clear floats after the columns */
+.row:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+</style>
+
+
+
+<div class="row">
+  <div class="column">
+    <ul type="dash">
+      <li>Simplicity</li>
+      <li>Reliability of statically typed languages with flexibility of dynamic languages</li>
+      <li>No runtime dependencies</li>
+      <li>Rapid prototyping</li>
+      <li>Built-in concurrency</li>
+      <li>Multiplatform and cross compilation</li>
+    </ul>
+  </div>
+  <div class="column">
+    <img src="./the_power_go_interfaces_files/rggo.jpg" alt="rggo" width="100%">
+  </div>
+</div>
+
+
+
+<figcaption><i>Go</i> <i>Gopher</i> (CC BY 3.0) original design by <a href="http://reneefrench.blogspot.com/" target="_blank">Renee French</a></figcaption>
+      
+      <span class="pagenumber">2</span>
+      </article>
+  
+  
+  
+      <article class="background" style="background-image: url(&#39;images/slide-back.png&#39;)">
+      
+        <h3>Less is Exponentially More</h3>
+        <ul>
+<li>Readable</li>
+<li>Opinionated</li>
+<li>Reduced set of features</li>
+<li>Object Oriented, but...</li>
+</ul>
+<p>There are no:</p>
+<ul>
+<li>Classes</li>
+<li>Constructors</li>
+<li>Inheritance (Type Hierarchy)</li>
+<li>Method Overloading</li>
+<li>Generics*</li>
+</ul>
+
+      
+      <span class="pagenumber">3</span>
+      </article>
+  
+  
+  
+      <article class="background" style="background-image: url(&#39;images/title-back.png&#39;)">
+      
+        <h2>Interfaces</h2>
+      
+      <span class="pagenumber">4</span>
+      </article>
+  
+  
+  
+      <article class="background" style="background-image: url(&#39;images/slide-back.png&#39;)">
+      
+        <h3>Interfaces</h3>
+        <p>A way to enable seemingly incompatible entities to interact</p>
+
+<div class="image">
+  <img src="./the_power_go_interfaces_files/outlet.png" height="300">
+</div>
+<ul>
+<li>Specify a set of methods</li>
+<li>Hide the implementation</li>
+<li>Define a <em>contract</em></li>
+</ul>
+
+      
+      <span class="pagenumber">5</span>
+      </article>
+  
+  
+  
+      <article class="background" style="background-image: url(&#39;images/slide-back.png&#39;)">
+      
+        <h3>Interfaces in Go</h3>
+        <p>The Abstract Type</p>
+<ul>
+<li>Defines behaviour only</li>
+<li>Implicitly satisfied</li>
+<li>Small</li>
+</ul>
+
+      
+      <span class="pagenumber">6</span>
+      </article>
+  
+  
+  
+      <article class="background" style="background-image: url(&#39;images/slide-back.png&#39;)">
+      
+        <h3>Concrete Types</h3>
+        
+  <div class="code">
+<pre><span num="5">var power int</span>
+<span num="6"></span>
+<span num="7">type Jedi struct {</span>
+<span num="8">    FirstName string</span>
+<span num="9">    LastName  string</span>
+<span num="10">    Age       int</span>
+<span num="11">    Rank      string</span>
+<span num="12">}</span>
+<span num="13"></span>
+<span num="14">func foo() {</span>
+<span num="15">    name := "Luke"    // string</span>
+<span num="17">}</span>
+</pre>
+</div>
+
+      
+      <span class="pagenumber">7</span>
+      </article>
+  
+  
+  
+      <article class="background far-past" style="background-image: url(&#39;images/slide-back.png&#39;)">
+      
+        <h3>Defining Behaviour (Methods)</h3>
+        
+  <div class="code">
+<pre><span num="4">type Jedi struct {</span>
+<span num="5">    FirstName string</span>
+<span num="6">    LastName  string</span>
+<span num="7">    Age       int</span>
+<span num="8">    Rank      string</span>
+<span num="9">}</span>
+<span num="10"></span>
+<span num="11"><b>func (j Jedi) ForcePush(p int) int {</b></span>
+<span num="12">    // TODO Method implementation</span>
+<span num="13">    return p</span>
+<span num="14"><b>}</b></span>
+<span num="15"></span>
+<span num="16">type power int</span>
+<span num="17"></span>
+<span num="18"><b>func (p power) unleash() {</b></span>
+<span num="19">    // TODO Method implementation</span>
+<span num="20">}</span>
+</pre>
+</div>
+
+      
+      <span class="pagenumber">8</span>
+      </article>
+  
+  
+  
+      <article class="background past" style="background-image: url(&#39;images/slide-back.png&#39;)">
+      
+        <h3>Defining Interfaces</h3>
+        
+  <div class="code">
+<pre><span num="24">type ForceUser interface {</span>
+<span num="25">    ForcePush(int) int</span>
+<span num="26">}</span>
+</pre>
+</div>
+
+      
+      <span class="pagenumber">9</span>
+      </article>
+  
+  
+  
+      <article class="background current" style="background-image: url(&#39;images/slide-back.png&#39;)">
+      
+        <h3>Example</h3>
+        
+  <div class="code playground">
+<pre><span num="1">package main</span>
+<span num="2"></span>
+<span num="3">import "fmt"</span>
+<span num="4"></span>
+<span num="5">type Jedi struct {</span>
+<span num="6">    FirstName string</span>
+<span num="7">    LastName  string</span>
+<span num="8">    Age       int</span>
+<span num="9">    Rank      string</span>
+<span num="10">}</span>
+<span num="11"></span>
+<span num="12">func main() {</span>
+<span num="13">    luke := Jedi{</span>
+<span num="14">        FirstName: "Luke",</span>
+<span num="15">        LastName:  "Skywalker",</span>
+<span num="16">        Age:       22,</span>
+<span num="17">        Rank:      "Master",</span>
+<span num="18">    }</span>
+<span num="19"></span>
+<span num="20">    fmt.Println(luke)</span>
+<span num="21">}</span>
+</pre>
+</div><div class="buttons"><button class="run" style="display: inline-block;">Run</button></div><div class="ui-resizable output" style="display: none;"><div class="ui-resizable-handle ui-resizable-n" style="z-index: 90; display: block;"></div><div class="ui-resizable-handle ui-resizable-w" style="z-index: 90; display: block;"></div><div class="ui-resizable-handle ui-resizable-nw" style="z-index: 90; display: block;"></div><div class="buttons"><button class="run">Run</button><button class="kill">Kill</button><button class="close">Close</button></div><pre><span class="stdout">{Luke Skywalker 22 Master}
+</span><span class="system">
+Program exited.</span></pre></div>
+
+      
+      <span class="pagenumber">10</span>
+      </article>
+  
+  
+  
+      <article class="background next" style="background-image: url(&#39;images/slide-back.png&#39;)">
+      
+        <h3>Example (cont.)</h3>
+        
+  <div class="code playground" contenteditable="true" spellcheck="false">
+<pre style="display: none"><span>package main
+
+import "fmt"
+
+</span></pre><pre contenteditable="true" spellcheck="false"><span num="6">type Jedi struct {</span>
+<span num="7">    FirstName string</span>
+<span num="8">    LastName  string</span>
+<span num="9">    Age       int</span>
+<span num="10">    Rank      string</span>
+<span num="11">}</span>
+<span num="12"></span>
+<span num="13">func (j Jedi) String() string {</span>
+<span num="14">    return j.FirstName + " " + j.LastName</span>
+<span num="15">}</span>
+<span num="16"></span>
+<span num="17">func main() {</span>
+<span num="18">    luke := Jedi{</span>
+<span num="19">        FirstName: "Luke",</span>
+<span num="20">        LastName:  "Skywalker",</span>
+<span num="21">        Age:       22,</span>
+<span num="22">        Rank:      "Master",</span>
+<span num="23">    }</span>
+<span num="24"></span>
+<span num="25">    fmt.Println(luke)</span>
+<span num="26">}</span>
+</pre>
+</div><div class="buttons"><button class="run">Run</button></div><div class="ui-resizable output" style="display: none;"><div class="ui-resizable-handle ui-resizable-n" style="z-index: 90; display: block;"></div><div class="ui-resizable-handle ui-resizable-w" style="z-index: 90; display: block;"></div><div class="ui-resizable-handle ui-resizable-nw" style="z-index: 90; display: block;"></div><div class="buttons"><button class="run">Run</button><button class="kill">Kill</button><button class="close">Close</button></div><pre></pre></div>
+
+      
+      <span class="pagenumber">11</span>
+      </article>
+  
+  
+  
+      <article class="background far-next" style="background-image: url(&#39;images/slide-back.png&#39;)">
+      
+        <h3>fmt.Stringer Interface</h3>
+        
+  <div class="code">
+<pre><span num="57">// Stringer is implemented by any value that has a String method,</span>
+<span num="58">// which defines the ``native'' format for that value.</span>
+<span num="59">// The String method is used to print values passed as an operand</span>
+<span num="60">// to any format that accepts a string or to an unformatted printer</span>
+<span num="61">// such as Print.</span>
+<span num="62">type Stringer interface {</span>
+<span num="63">    String() string</span>
+<span num="64">}</span>
+</pre>
+</div>
+
+      
+      <span class="pagenumber">12</span>
+      </article>
+  
+  
+  
+      <article class="background" style="background-image: url(&#39;images/slide-back.png&#39;)">
+      
+        <h3>Implicit Satisfaction - No dependencies</h3>
+        
+  <div class="code">
+<pre><span num="1">package force</span>
+<span num="2"></span>
+<span num="3">type Jedi struct {</span>
+<span num="4">    FirstName string</span>
+<span num="5">    LastName  string</span>
+<span num="6">    Age       int</span>
+<span num="7">    Rank      string</span>
+<span num="8">}</span>
+<span num="9"></span>
+<span num="10">func (j Jedi) String() string {</span>
+<span num="11">    return j.FirstName + " " + j.LastName</span>
+<span num="12">}</span>
+</pre>
+</div>
+
+      
+      <span class="pagenumber">13</span>
+      </article>
+  
+  
+  
+      <article class="background" style="background-image: url(&#39;images/slide-back.png&#39;)">
+      
+        <h3>Implicit Satisfaction - No dependencies (cont.)</h3>
+        
+  <div class="code playground">
+<pre><span num="1">package main</span>
+<span num="2"></span>
+<span num="3">import (</span>
+<span num="4">    "fmt"</span>
+<span num="5"></span>
+<span num="6">    "github.com/rgerardi/philly-ete-2021/print3/force"</span>
+<span num="7">)</span>
+<span num="8"></span>
+<span num="9">func main() {</span>
+<span num="10">    luke := force.Jedi{</span>
+<span num="11">        FirstName: "Luke",</span>
+<span num="12">        LastName:  "Skywalker",</span>
+<span num="13">        Age:       22,</span>
+<span num="14">        Rank:      "Master",</span>
+<span num="15">    }</span>
+<span num="16"></span>
+<span num="17">    fmt.Println(luke)</span>
+<span num="18">}</span>
+</pre>
+</div><div class="buttons"><button class="run">Run</button></div><div class="ui-resizable output" style="display: none;"><div class="ui-resizable-handle ui-resizable-n" style="z-index: 90; display: block;"></div><div class="ui-resizable-handle ui-resizable-w" style="z-index: 90; display: block;"></div><div class="ui-resizable-handle ui-resizable-nw" style="z-index: 90; display: block;"></div><div class="buttons"><button class="run">Run</button><button class="kill">Kill</button><button class="close">Close</button></div><pre></pre></div>
+
+      
+      <span class="pagenumber">14</span>
+      </article>
+  
+  
+  
+      <article class="background" style="background-image: url(&#39;images/slide-back.png&#39;)">
+      
+        <h3>Small interfaces - powerful abstractions</h3>
+        
+  <div class="code playground">
+<pre><span num="1">package main</span>
+<span num="2"></span>
+<span num="3">import (</span>
+<span num="4">    "fmt"</span>
+<span num="5">    "io/ioutil"</span>
+<span num="6">    "os"</span>
+<span num="7">)</span>
+<span num="8"></span>
+<span num="9">func main() {</span>
+<span num="10">    fmt.Println("Writing data")</span>
+<span num="11">    data := []byte("Some data to write")</span>
+<span num="12"></span>
+<span num="13">    f, _ := ioutil.TempFile("/tmp", "data")</span>
+<span num="14">    defer f.Close()</span>
+<span num="15"></span>
+<span num="16">    save(f, data)</span>
+<span num="17">}</span>
+<span num="18"></span>
+<span num="19">func save(f *os.File, data []byte) error {</span>
+<span num="20">    _, err := f.Write(data)</span>
+<span num="21">    return err</span>
+<span num="22">}</span>
+</pre>
+</div><div class="buttons"><button class="run">Run</button></div><div class="ui-resizable output" style="display: none;"><div class="ui-resizable-handle ui-resizable-n" style="z-index: 90; display: block;"></div><div class="ui-resizable-handle ui-resizable-w" style="z-index: 90; display: block;"></div><div class="ui-resizable-handle ui-resizable-nw" style="z-index: 90; display: block;"></div><div class="buttons"><button class="run">Run</button><button class="kill">Kill</button><button class="close">Close</button></div><pre></pre></div>
+
+      
+      <span class="pagenumber">15</span>
+      </article>
+  
+  
+  
+      <article class="background" style="background-image: url(&#39;images/slide-back.png&#39;)">
+      
+        <h3>io.Writer interface</h3>
+        
+  <div class="code">
+<pre><span num="87">// Writer is the interface that wraps the basic Write method.</span>
+<span num="88">//</span>
+<span num="89">// Write writes len(p) bytes from p to the underlying data stream.</span>
+<span num="90">// It returns the number of bytes written from p (0 &lt;= n &lt;= len(p))</span>
+<span num="91">// and any error encountered that caused the write to stop early.</span>
+<span num="92">// Write must return a non-nil error if it returns n &lt; len(p).</span>
+<span num="93">// Write must not modify the slice data, even temporarily.</span>
+<span num="94">//</span>
+<span num="95">// Implementations must not retain p.</span>
+<span num="96">type Writer interface {</span>
+<span num="97">    Write(p []byte) (n int, err error)</span>
+<span num="98">}</span>
+</pre>
+</div>
+
+      
+      <span class="pagenumber">16</span>
+      </article>
+  
+  
+  
+      <article class="background" style="background-image: url(&#39;images/slide-back.png&#39;)">
+      
+        <h3>Require only what you need</h3>
+        
+  <div class="code playground">
+<pre><span num="1">package main</span>
+<span num="2"></span>
+<span num="3">import (</span>
+<span num="4">    "fmt"</span>
+<span num="5">    "io"</span>
+<span num="6">    "io/ioutil"</span>
+<span num="7">)</span>
+<span num="8"></span>
+<span num="9">func main() {</span>
+<span num="10">    fmt.Println("Writing data")</span>
+<span num="11">    data := []byte("Some data to write")</span>
+<span num="12"></span>
+<span num="13">    f, _ := ioutil.TempFile("/tmp", "data")</span>
+<span num="14">    defer f.Close()</span>
+<span num="15"></span>
+<span num="16">    save(f, data)</span>
+<span num="17">}</span>
+<span num="18"></span>
+<span num="19">func save(w io.Writer, data []byte) error {</span>
+<span num="20">    _, err := w.Write(data)</span>
+<span num="21">    return err</span>
+<span num="22">}</span>
+</pre>
+</div><div class="buttons"><button class="run">Run</button></div><div class="ui-resizable output" style="display: none;"><div class="ui-resizable-handle ui-resizable-n" style="z-index: 90; display: block;"></div><div class="ui-resizable-handle ui-resizable-w" style="z-index: 90; display: block;"></div><div class="ui-resizable-handle ui-resizable-nw" style="z-index: 90; display: block;"></div><div class="buttons"><button class="run">Run</button><button class="kill">Kill</button><button class="close">Close</button></div><pre></pre></div>
+
+      
+      <span class="pagenumber">17</span>
+      </article>
+  
+  
+  
+      <article class="background" style="background-image: url(&#39;images/slide-back.png&#39;)">
+      
+        <h3>Small interfaces - Flexible implementation</h3>
+        
+  <div class="code playground" contenteditable="true" spellcheck="false">
+<pre style="display: none"><span>package main
+
+import (
+	"fmt"
+	"io/ioutil"
+	"net"
+	"os"
+)
+
+</span></pre><pre contenteditable="true" spellcheck="false"><span num="11">func main() {</span>
+<span num="12">    ln, err := net.Listen("tcp", ":3000")</span>
+<span num="13">    if err != nil {</span>
+<span num="14">        os.Exit(1)</span>
+<span num="15">    }</span>
+<span num="16">    fmt.Println("Listening on port 3000")</span>
+<span num="17">    for {</span>
+<span num="18">        conn, err := ln.Accept()</span>
+<span num="19">        if err != nil {</span>
+<span num="20">            os.Exit(1)</span>
+<span num="21">        }</span>
+<span num="22">        go handleConnection(conn)</span>
+<span num="23">    }</span>
+<span num="24">}</span>
+<span num="25"></span>
+<span num="26">func handleConnection(conn net.Conn) {</span>
+<span num="27">    msg, err := ioutil.ReadAll(conn)</span>
+<span num="28">    if err != nil {</span>
+<span num="29">        os.Exit(1)</span>
+<span num="30">    }</span>
+<span num="31">    fmt.Printf("%s\n", msg)</span>
+<span num="32">    conn.Close()</span>
+<span num="33">}</span>
+</pre>
+</div><div class="buttons"><button class="run">Run</button></div><div class="ui-resizable output" style="display: none;"><div class="ui-resizable-handle ui-resizable-n" style="z-index: 90; display: block;"></div><div class="ui-resizable-handle ui-resizable-w" style="z-index: 90; display: block;"></div><div class="ui-resizable-handle ui-resizable-nw" style="z-index: 90; display: block;"></div><div class="buttons"><button class="run">Run</button><button class="kill">Kill</button><button class="close">Close</button></div><pre></pre></div>
+
+      
+      <span class="pagenumber">18</span>
+      </article>
+  
+  
+  
+      <article class="background" style="background-image: url(&#39;images/slide-back.png&#39;)">
+      
+        <h3>Small interfaces - Flexible implementation</h3>
+        
+  <div class="code playground" contenteditable="true" spellcheck="false">
+<pre contenteditable="true" spellcheck="false"><span num="1">package main</span>
+<span num="2"></span>
+<span num="3">import (</span>
+<span num="4">    "fmt"</span>
+<span num="5">    "io"</span>
+<span num="6">    "net"</span>
+<span num="7">)</span>
+<span num="8"></span>
+<span num="9">func main() {</span>
+<span num="10">    fmt.Println("Writing data")</span>
+<span num="11">    data := []byte("Some data to write")</span>
+<span num="12"></span>
+<span num="13">    <b>client, _ := net.Dial("tcp", ":3000")</b></span>
+<span num="14">    <b>defer client.Close()</b></span>
+<span num="15"></span>
+<span num="16">    save(client, data)</span>
+<span num="17">}</span>
+<span num="18"></span>
+<span num="19">func save(w io.Writer, data []byte) error {</span>
+<span num="20">    _, err := w.Write(data)</span>
+<span num="21">    return err</span>
+<span num="22">}</span>
+</pre>
+</div><div class="buttons"><button class="run">Run</button></div><div class="ui-resizable output" style="display: none;"><div class="ui-resizable-handle ui-resizable-n" style="z-index: 90; display: block;"></div><div class="ui-resizable-handle ui-resizable-w" style="z-index: 90; display: block;"></div><div class="ui-resizable-handle ui-resizable-nw" style="z-index: 90; display: block;"></div><div class="buttons"><button class="run">Run</button><button class="kill">Kill</button><button class="close">Close</button></div><pre></pre></div>
+
+      
+      <span class="pagenumber">19</span>
+      </article>
+  
+  
+  
+      <article class="background" style="background-image: url(&#39;images/slide-back.png&#39;)">
+      
+        <h3>Small interfaces - Extensive usage</h3>
+        
+  <div class="code playground" contenteditable="true" spellcheck="false">
+<pre style="display: none"><span>package main
+
+import (
+	"fmt"
+	"io"
+	"net"
+)
+
+</span></pre><pre contenteditable="true" spellcheck="false"><span num="10">func main() {</span>
+<span num="11">    fmt.Println("Writing data")</span>
+<span num="12">    data := []byte("Some data to write")</span>
+<span num="13"></span>
+<span num="14">    client, _ := net.Dial("tcp", ":3000")</span>
+<span num="15">    defer client.Close()</span>
+<span num="16"></span>
+<span num="17">    <b>save(LogWriter(client), data)</b></span>
+<span num="18">}</span>
+<span num="19"></span>
+<span num="20">type logWriter struct {</span>
+<span num="21">    writer io.Writer</span>
+<span num="22">}</span>
+<span num="23"></span>
+<span num="24">func (l logWriter) Write(p []byte) (n int, err error) {</span>
+<span num="25">    fmt.Printf("%s\n", p)</span>
+<span num="26">    return l.writer.Write(p)</span>
+<span num="27">}</span>
+<span num="28"></span>
+<span num="29"><b>func LogWriter(w io.Writer) io.Writer {</b></span>
+<span num="30">    <b>return logWriter{w}</b></span>
+<span num="31"><b>}</b></span>
+</pre>
+<pre style="display: none"><span>
+func save(w io.Writer, data []byte) error {
+	_, err := w.Write(data)
+	return err
+}
+</span></pre></div><div class="buttons"><button class="run">Run</button></div><div class="ui-resizable output" style="display: none;"><div class="ui-resizable-handle ui-resizable-n" style="z-index: 90; display: block;"></div><div class="ui-resizable-handle ui-resizable-w" style="z-index: 90; display: block;"></div><div class="ui-resizable-handle ui-resizable-nw" style="z-index: 90; display: block;"></div><div class="buttons"><button class="run">Run</button><button class="kill">Kill</button><button class="close">Close</button></div><pre></pre></div>
+
+      
+      <span class="pagenumber">20</span>
+      </article>
+  
+  
+  
+      <article class="background" style="background-image: url(&#39;images/title-back.png&#39;)">
+      
+        <h2>Testing</h2>
+      
+      <span class="pagenumber">21</span>
+      </article>
+  
+  
+  
+      <article class="background" style="background-image: url(&#39;images/slide-back.png&#39;)">
+      
+        <h3>How to test this code?</h3>
+        
+  <div class="code">
+<pre><span num="19">func save(f *os.File, data []byte) error {</span>
+<span num="20">    _, err := f.Write(data)</span>
+<span num="21">    return err</span>
+<span num="22">}</span>
+</pre>
+</div>
+
+  <div class="code">
+<pre class="numbers"><span num="10">func Test_Save(t *testing.T) {</span>
+<span num="11">    testdata := "Test data"</span>
+<span num="12">    f, err := ioutil.TempFile("/tmp", "data")</span>
+<span num="13">    if err != nil {</span>
+<span num="14">        t.Fatal("Error creating test file")</span>
+<span num="15">    }</span>
+<span num="16">    defer os.Remove(f.Name())</span>
+<span num="17"></span>
+<span num="18">    <b>if err := save(f, []byte(testdata)); err != nil {</b></span>
+<span num="19">        t.Fatal("Error saving data")</span>
+<span num="20">    }</span>
+<span num="21">    f.Close()</span>
+<span num="22"></span>
+<span num="23">    data, _ := ioutil.ReadFile(f.Name())</span>
+<span num="24">    <b>if string(data) != testdata {</b></span>
+<span num="25">        t.Errorf("Expected %s, got %s\n", testdata, string(data))</span>
+<span num="26">    }</span>
+<span num="27">}</span>
+</pre>
+</div>
+
+      
+      <span class="pagenumber">22</span>
+      </article>
+  
+  
+  
+      <article class="background" style="background-image: url(&#39;images/slide-back.png&#39;)">
+      
+        <h3>Interfaces Improve Testing</h3>
+        
+  <div class="code">
+<pre><span num="19">func save(w io.Writer, data []byte) error {</span>
+<span num="20">    _, err := w.Write(data)</span>
+<span num="21">    return err</span>
+<span num="22">}</span>
+</pre>
+</div>
+
+  <div class="code">
+<pre class="numbers"><span num="10">func Test_Save(t *testing.T) {</span>
+<span num="11">    <b>buf := &amp;bytes.Buffer{}</b></span>
+<span num="12">    testdata := "Test data"</span>
+<span num="13"></span>
+<span num="14">    if err := save(buf, []byte(testdata)); err != nil {</span>
+<span num="15">        t.Fatal("Error saving data")</span>
+<span num="16">    }</span>
+<span num="17"></span>
+<span num="18">    if buf.String() != testdata {</span>
+<span num="19">        t.Errorf("Expected %s, got %s\n", testdata, buf.String())</span>
+<span num="20">    }</span>
+<span num="21">}</span>
+</pre>
+</div>
+<pre><code>=== RUN   Test_Save
+--- PASS: Test_Save (0.00s)
+PASS
+ok      github.com/rgerardi/philly-ete-2021/testing/ex2 0.006s</code></pre>
+
+      
+      <span class="pagenumber">23</span>
+      </article>
+  
+  
+  
+      <article class="background" style="background-image: url(&#39;images/title-back.png&#39;)">
+      
+        <h2>Duck Typing</h2>
+      
+      <span class="pagenumber">24</span>
+      </article>
+  
+  
+  
+      <article class="background" style="background-image: url(&#39;images/slide-back.png&#39;)">
+      
+        <h3>Duck Typing</h3>
+        <p>"If it walks like a duck and it quacks like a duck, then it must be a duck"</p>
+<p class="link"><a href="https://en.wikipedia.org/wiki/Duck_typing" target="_blank">en.wikipedia.org/wiki/Duck_typing</a></p><p>In Go:</p>
+<p>"If it walks like a duck and it quacks like a duck, then it BEHAVES like a duck"</p>
+
+      
+      <span class="pagenumber">25</span>
+      </article>
+  
+  
+  
+      <article class="background" style="background-image: url(&#39;images/slide-back.png&#39;)">
+      
+        <h3>Example</h3>
+        
+  <div class="code">
+<pre><span num="2">package shape</span>
+<span num="3"></span>
+<span num="4">import "math"</span>
+<span num="5"></span>
+<span num="6">type Circle struct {</span>
+<span num="7">    Radius float64</span>
+<span num="8">}</span>
+<span num="9"></span>
+<span num="10">func (c Circle) Perimeter() float64 {</span>
+<span num="11">    return math.Pi * 2 * c.Radius</span>
+<span num="12">}</span>
+<span num="13"></span>
+<span num="14">type Rectangle struct {</span>
+<span num="15">    Length float64</span>
+<span num="16">    Width  float64</span>
+<span num="17">}</span>
+<span num="18"></span>
+<span num="19">func (r Rectangle) Perimeter() float64 {</span>
+<span num="20">    return 2 * (r.Length + r.Width)</span>
+<span num="21">}</span>
+</pre>
+</div>
+
+      
+      <span class="pagenumber">26</span>
+      </article>
+  
+  
+  
+      <article class="background" style="background-image: url(&#39;images/slide-back.png&#39;)">
+      
+        <h3>Example (cont.)</h3>
+        
+  <div class="code playground" contenteditable="true" spellcheck="false">
+<pre contenteditable="true" spellcheck="false"><span num="2">package main</span>
+<span num="3"></span>
+<span num="4">import (</span>
+<span num="5">    "fmt"</span>
+<span num="6"></span>
+<span num="7">    "github.com/rgerardi/philly-ete-2021/shape/shape"</span>
+<span num="8">)</span>
+<span num="9"></span>
+<span num="10"><b>type border interface {</b></span>
+<span num="11">    <b>Perimeter() float64</b></span>
+<span num="12"><b>}</b></span>
+<span num="13"></span>
+<span num="14">func main() {</span>
+<span num="15">    c := shape.Circle{5}</span>
+<span num="16">    r := shape.Rectangle{20, 10}</span>
+<span num="17"></span>
+<span num="18">    printBorder(c)</span>
+<span num="19">    printBorder(r)</span>
+<span num="20">}</span>
+<span num="21"></span>
+<span num="22"><b>func printBorder(b border) {</b></span>
+<span num="23">    fmt.Println("Border length is", b.Perimeter())</span>
+<span num="24">}</span>
+</pre>
+</div><div class="buttons"><button class="run">Run</button></div><div class="ui-resizable output" style="display: none;"><div class="ui-resizable-handle ui-resizable-n" style="z-index: 90; display: block;"></div><div class="ui-resizable-handle ui-resizable-w" style="z-index: 90; display: block;"></div><div class="ui-resizable-handle ui-resizable-nw" style="z-index: 90; display: block;"></div><div class="buttons"><button class="run">Run</button><button class="kill">Kill</button><button class="close">Close</button></div><pre></pre></div>
+
+      
+      <span class="pagenumber">27</span>
+      </article>
+  
+  
+  
+      <article class="background" style="background-image: url(&#39;images/slide-back.png&#39;)">
+      
+        <h3>Composition</h3>
+        
+  <div class="code playground" contenteditable="true" spellcheck="false">
+<pre style="display: none"><span>package main
+
+import (
+	"fmt"
+
+	"github.com/rgerardi/philly-ete-2021/shape/shape"
+)
+
+</span></pre><pre contenteditable="true" spellcheck="false"><span num="10">type border interface {</span>
+<span num="11">    Perimeter() float64</span>
+<span num="12">}</span>
+<span num="13"></span>
+<span num="14">type square struct {</span>
+<span num="15">    shape.Rectangle</span>
+<span num="16">}</span>
+<span num="17"></span>
+<span num="18">func newSquare(side float64) square {</span>
+<span num="19">    return square{shape.Rectangle{side, side}}</span>
+<span num="20">}</span>
+<span num="21"></span>
+<span num="22">func main() {</span>
+<span num="23">    c := shape.Circle{5}</span>
+<span num="24">    r := shape.Rectangle{20, 10}</span>
+<span num="25">    s := newSquare(5)</span>
+<span num="26"></span>
+<span num="27">    printBorder(c)</span>
+<span num="28">    printBorder(r)</span>
+<span num="29">    printBorder(s)</span>
+<span num="30">}</span>
+</pre>
+<pre style="display: none"><span>func printBorder(b border) {
+	fmt.Println("Border length is", b.Perimeter())
+}
+</span></pre></div><div class="buttons"><button class="run">Run</button></div><div class="ui-resizable output" style="display: none;"><div class="ui-resizable-handle ui-resizable-n" style="z-index: 90; display: block;"></div><div class="ui-resizable-handle ui-resizable-w" style="z-index: 90; display: block;"></div><div class="ui-resizable-handle ui-resizable-nw" style="z-index: 90; display: block;"></div><div class="buttons"><button class="run">Run</button><button class="kill">Kill</button><button class="close">Close</button></div><pre></pre></div>
+
+      
+      <span class="pagenumber">28</span>
+      </article>
+  
+  
+  
+      <article class="background" style="background-image: url(&#39;images/slide-back.png&#39;)">
+      
+        <h3>Composition is not inheritance</h3>
+        
+  <div class="code playground" contenteditable="true" spellcheck="false">
+<pre style="display: none"><span>package main
+
+import (
+	"fmt"
+
+	"github.com/rgerardi/philly-ete-2021/shape/shape"
+)
+
+</span></pre><pre contenteditable="true" spellcheck="false"><span num="10">type border interface {</span>
+<span num="11">    Perimeter() float64</span>
+<span num="12">}</span>
+<span num="13"></span>
+<span num="14">type square struct {</span>
+<span num="15">    shape.Rectangle</span>
+<span num="16">}</span>
+<span num="17"></span>
+<span num="18">func newSquare(side float64) square {</span>
+<span num="19">    return square{shape.Rectangle{side, side}}</span>
+<span num="20">}</span>
+<span num="21"></span>
+<span num="22">func main() {</span>
+<span num="23">    shapes := make([]shape.Rectangle, 3)</span>
+<span num="24"></span>
+<span num="25">    shapes[0] = shape.Rectangle{10, 5}</span>
+<span num="26">    shapes[1] = newSquare(5)</span>
+<span num="27">}</span>
+</pre>
+<pre style="display: none"><span>func printBorder(b border) {
+	fmt.Println("Border length is", b.Perimeter())
+}
+</span></pre></div><div class="buttons"><button class="run">Run</button></div><div class="ui-resizable output" style="display: none;"><div class="ui-resizable-handle ui-resizable-n" style="z-index: 90; display: block;"></div><div class="ui-resizable-handle ui-resizable-w" style="z-index: 90; display: block;"></div><div class="ui-resizable-handle ui-resizable-nw" style="z-index: 90; display: block;"></div><div class="buttons"><button class="run">Run</button><button class="kill">Kill</button><button class="close">Close</button></div><pre></pre></div>
+
+      
+      <span class="pagenumber">29</span>
+      </article>
+  
+  
+  
+      <article class="background" style="background-image: url(&#39;images/slide-back.png&#39;)">
+      
+        <h3>Grouping through behaviour</h3>
+        
+  <div class="code playground" contenteditable="true" spellcheck="false">
+<pre style="display: none"><span>package main
+
+import (
+	"fmt"
+
+	"github.com/rgerardi/philly-ete-2021/shape/shape"
+)
+
+</span></pre><pre contenteditable="true" spellcheck="false"><span num="10">type border interface {</span>
+<span num="11">    Perimeter() float64</span>
+<span num="12">}</span>
+<span num="13"></span>
+<span num="14">type square struct {</span>
+<span num="15">    shape.Rectangle</span>
+<span num="16">}</span>
+<span num="17"></span>
+<span num="18">func newSquare(side float64) square {</span>
+<span num="19">    return square{shape.Rectangle{side, side}}</span>
+<span num="20">}</span>
+<span num="21"></span>
+<span num="22">func main() {</span>
+<span num="23">    shapes := make([]border, 3)</span>
+<span num="24"></span>
+<span num="25">    shapes[0] = shape.Rectangle{10, 5}</span>
+<span num="26">    shapes[1] = newSquare(5)</span>
+<span num="27">    shapes[2] = shape.Circle{3}</span>
+<span num="28"></span>
+<span num="29">    for _, s := range shapes {</span>
+<span num="30">        printBorder(s)</span>
+<span num="31">    }</span>
+<span num="32">}</span>
+</pre>
+<pre style="display: none"><span>func printBorder(b border) {
+	fmt.Println("Border length is", b.Perimeter())
+}
+</span></pre></div><div class="buttons"><button class="run">Run</button></div><div class="ui-resizable output" style="display: none;"><div class="ui-resizable-handle ui-resizable-n" style="z-index: 90; display: block;"></div><div class="ui-resizable-handle ui-resizable-w" style="z-index: 90; display: block;"></div><div class="ui-resizable-handle ui-resizable-nw" style="z-index: 90; display: block;"></div><div class="buttons"><button class="run">Run</button><button class="kill">Kill</button><button class="close">Close</button></div><pre></pre></div>
+
+      
+      <span class="pagenumber">30</span>
+      </article>
+  
+  
+  
+      <article class="background" style="background-image: url(&#39;images/slide-back.png&#39;)">
+      
+        <h3>Augmenting</h3>
+        
+  <div class="code">
+<pre><span num="2">package shape</span>
+</pre>
+</div>
+
+  <div class="code">
+<pre><span num="26">func (c Circle) Area() float64 {</span>
+<span num="27">    return math.Pi * c.Radius * c.Radius</span>
+<span num="28">}</span>
+<span num="29"></span>
+<span num="30">func (r Rectangle) Area() float64 {</span>
+<span num="31">    return r.Length * r.Width</span>
+<span num="32">}</span>
+</pre>
+</div>
+
+      
+      <span class="pagenumber">31</span>
+      </article>
+  
+  
+  
+      <article class="background" style="background-image: url(&#39;images/slide-back.png&#39;)">
+      
+        <h3>You can only call methods from interface</h3>
+        
+  <div class="code playground" contenteditable="true" spellcheck="false">
+<pre style="display: none"><span>package main
+
+import (
+	"fmt"
+
+	"github.com/rgerardi/philly-ete-2021/shape/shape"
+)
+
+</span></pre><pre contenteditable="true" spellcheck="false"><span num="10">type border interface {</span>
+<span num="11">    Perimeter() float64</span>
+<span num="12">}</span>
+<span num="13"></span>
+<span num="14">type square struct {</span>
+<span num="15">    shape.Rectangle</span>
+<span num="16">}</span>
+<span num="17"></span>
+<span num="18">func newSquare(side float64) square {</span>
+<span num="19">    return square{shape.Rectangle{side, side}}</span>
+<span num="20">}</span>
+<span num="21"></span>
+<span num="22">func main() {</span>
+<span num="23">    shapes := make([]border, 3)</span>
+<span num="24">    shapes[0] = shape.Rectangle{10, 5}</span>
+<span num="25">    shapes[1] = newSquare(5)</span>
+<span num="26">    shapes[2] = shape.Circle{3}</span>
+<span num="27">    for _, s := range shapes {</span>
+<span num="28">        printBorder(s)</span>
+<span num="29">        <b>fmt.Println(s.Area())</b></span>
+<span num="30">    }</span>
+<span num="31">}</span>
+</pre>
+<pre style="display: none"><span>func printBorder(b border) {
+	fmt.Println("Border length is", b.Perimeter())
+}
+</span></pre></div><div class="buttons"><button class="run">Run</button></div><div class="ui-resizable output" style="display: none;"><div class="ui-resizable-handle ui-resizable-n" style="z-index: 90; display: block;"></div><div class="ui-resizable-handle ui-resizable-w" style="z-index: 90; display: block;"></div><div class="ui-resizable-handle ui-resizable-nw" style="z-index: 90; display: block;"></div><div class="buttons"><button class="run">Run</button><button class="kill">Kill</button><button class="close">Close</button></div><pre></pre></div>
+
+      
+      <span class="pagenumber">32</span>
+      </article>
+  
+  
+  
+      <article class="background" style="background-image: url(&#39;images/slide-back.png&#39;)">
+      
+        <h3>Composing Interfaces</h3>
+        
+  <div class="code playground" contenteditable="true" spellcheck="false">
+<pre style="display: none"><span>package main
+
+import (
+	"fmt"
+
+	"github.com/rgerardi/philly-ete-2021/shape/shape"
+)
+
+type border interface {
+	Perimeter() float64
+}
+
+type square struct {
+	shape.Rectangle
+}
+
+func newSquare(side float64) square {
+	return square{shape.Rectangle{side, side}}
+}
+
+</span></pre><pre contenteditable="true" spellcheck="false"><span num="22"><b>type surface interface {</b></span>
+<span num="23">    <b>Area() float64</b></span>
+<span num="24"><b>}</b></span>
+<span num="25"></span>
+<span num="26">type surfaceBorder interface {</span>
+<span num="27">    border</span>
+<span num="28">    surface</span>
+<span num="29">}</span>
+<span num="30"></span>
+<span num="31">func main() {</span>
+<span num="32">    shapes := make([]surfaceBorder, 3)</span>
+<span num="33">    shapes[0] = shape.Rectangle{10, 5}</span>
+<span num="34">    shapes[1] = newSquare(5)</span>
+<span num="35">    shapes[2] = shape.Circle{3}</span>
+<span num="36">    for _, s := range shapes {</span>
+<span num="37">        printBorder(s)</span>
+<span num="38">        printArea(s)</span>
+<span num="39">    }</span>
+<span num="40">}</span>
+<span num="41"></span>
+<span num="42">func printArea(s surface) {</span>
+<span num="43">    fmt.Println("Surface area is", s.Area())</span>
+<span num="44">}</span>
+</pre>
+<pre style="display: none"><span>func printBorder(b border) {
+	fmt.Println("Border length is", b.Perimeter())
+}
+</span></pre></div><div class="buttons"><button class="run">Run</button></div><div class="ui-resizable output" style="display: none;"><div class="ui-resizable-handle ui-resizable-n" style="z-index: 90; display: block;"></div><div class="ui-resizable-handle ui-resizable-w" style="z-index: 90; display: block;"></div><div class="ui-resizable-handle ui-resizable-nw" style="z-index: 90; display: block;"></div><div class="buttons"><button class="run">Run</button><button class="kill">Kill</button><button class="close">Close</button></div><pre></pre></div>
+
+      
+      <span class="pagenumber">33</span>
+      </article>
+  
+  
+  
+      <article class="background" style="background-image: url(&#39;images/title-back.png&#39;)">
+      
+        <h2>Extra</h2>
+      
+      <span class="pagenumber">34</span>
+      </article>
+  
+  
+  
+      <article class="background" style="background-image: url(&#39;images/slide-back.png&#39;)">
+      
+        <h3>Type Assertions</h3>
+        
+  <div class="code playground" contenteditable="true" spellcheck="false">
+<pre style="display: none"><span>package main
+
+import (
+	"fmt"
+
+	"github.com/rgerardi/philly-ete-2021/shape/shape"
+)
+
+type border interface {
+	Perimeter() float64
+}
+
+type square struct {
+	shape.Rectangle
+}
+
+func newSquare(side float64) square {
+	return square{shape.Rectangle{side, side}}
+}
+
+type surface interface {
+	Area() float64
+}
+
+type surfaceBorder interface {
+	border
+	surface
+}
+
+</span></pre><pre contenteditable="true" spellcheck="false"><span num="31">func main() {</span>
+<span num="32">    shapes := make([]surfaceBorder, 3)</span>
+<span num="33">    shapes[0] = shape.Rectangle{10, 5}</span>
+<span num="34">    shapes[1] = newSquare(5)</span>
+<span num="35">    shapes[2] = shape.Circle{3}</span>
+<span num="36">    for _, s := range shapes {</span>
+<span num="37">        printBorder(s)</span>
+<span num="38">        printArea(s)</span>
+<span num="39"></span>
+<span num="40">        <b>if c, ok := s.(shape.Circle); ok {</b></span>
+<span num="41">            <b>fmt.Println("Radius is:", c.Radius)</b></span>
+<span num="42">        <b>}</b></span>
+<span num="43">    }</span>
+<span num="44">}</span>
+</pre>
+<pre style="display: none"><span>
+func printArea(s surface) {
+	fmt.Println("Surface area is", s.Area())
+}
+
+func printBorder(b border) {
+	fmt.Println("Border length is", b.Perimeter())
+}
+</span></pre></div><div class="buttons"><button class="run">Run</button></div><div class="ui-resizable output" style="display: none;"><div class="ui-resizable-handle ui-resizable-n" style="z-index: 90; display: block;"></div><div class="ui-resizable-handle ui-resizable-w" style="z-index: 90; display: block;"></div><div class="ui-resizable-handle ui-resizable-nw" style="z-index: 90; display: block;"></div><div class="buttons"><button class="run">Run</button><button class="kill">Kill</button><button class="close">Close</button></div><pre></pre></div>
+
+      
+      <span class="pagenumber">35</span>
+      </article>
+  
+  
+  
+      <article class="background" style="background-image: url(&#39;images/slide-back.png&#39;)">
+      
+        <h3>Type Switch</h3>
+        
+  <div class="code playground" contenteditable="true" spellcheck="false">
+<pre style="display: none"><span>package main
+
+import (
+	"fmt"
+
+	"github.com/rgerardi/philly-ete-2021/shape/shape"
+)
+
+type border interface {
+	Perimeter() float64
+}
+
+type square struct {
+	shape.Rectangle
+}
+
+func newSquare(side float64) square {
+	return square{shape.Rectangle{side, side}}
+}
+
+type surface interface {
+	Area() float64
+}
+
+type surfaceBorder interface {
+	border
+	surface
+}
+
+</span></pre><pre contenteditable="true" spellcheck="false"><span num="31">func main() {</span>
+<span num="32">    shapes := make([]surfaceBorder, 3)</span>
+<span num="33">    shapes[0] = shape.Rectangle{10, 5}</span>
+<span num="34">    shapes[1] = newSquare(5)</span>
+<span num="35">    shapes[2] = shape.Circle{3}</span>
+<span num="36">    for _, s := range shapes {</span>
+<span num="37">        <b>switch c := s.(type) {</b></span>
+<span num="38">        <b>case shape.Circle:</b></span>
+<span num="39">            <b>fmt.Println("Radius is:", c.Radius)</b></span>
+<span num="40">        <b>case shape.Rectangle:</b></span>
+<span num="41">            <b>fmt.Println("Length is:", c.Length)</b></span>
+<span num="42">        <b>default:</b></span>
+<span num="43">            <b>fmt.Println("Not a rectangle or circle")</b></span>
+<span num="44">        <b>}</b></span>
+<span num="45">    }</span>
+<span num="46">}</span>
+</pre>
+<pre style="display: none"><span>
+func printArea(s surface) {
+	fmt.Println("Surface area is", s.Area())
+}
+
+func printBorder(b border) {
+	fmt.Println("Border length is", b.Perimeter())
+}
+</span></pre></div><div class="buttons"><button class="run">Run</button></div><div class="ui-resizable output" style="display: none;"><div class="ui-resizable-handle ui-resizable-n" style="z-index: 90; display: block;"></div><div class="ui-resizable-handle ui-resizable-w" style="z-index: 90; display: block;"></div><div class="ui-resizable-handle ui-resizable-nw" style="z-index: 90; display: block;"></div><div class="buttons"><button class="run">Run</button><button class="kill">Kill</button><button class="close">Close</button></div><pre></pre></div>
+
+      
+      <span class="pagenumber">36</span>
+      </article>
+  
+  
+  
+      <article class="background" style="background-image: url(&#39;images/slide-back.png&#39;)">
+      
+        <h3>Empty Interface: interface{}</h3>
+        <ul>
+<li>An interface that specifies no methods</li>
+<li>Often misunderstood</li>
+<li>Avoid using</li>
+</ul>
+<p>"The empty interface says nothing" (Rob Pike)</p>
+<p class="link"><a href="https://go-proverbs.github.io/" target="_blank">go-proverbs.github.io/</a></p>
+      
+      <span class="pagenumber">37</span>
+      </article>
+  
+  
+  
+      <article class="background" style="background-image: url(&#39;images/slide-back.png&#39;)">
+      
+        <h3>Learn More</h3>
+        <p class="link"><a href="https://tour.golang.org/methods/9" target="_blank">tour.golang.org/methods/9</a></p><p class="link"><a href="https://jordanorelli.com/post/32665860244/how-to-use-interfaces-in-go" target="_blank">jordanorelli.com/post/32665860244/how-to-use-interfaces-in-go</a></p><p class="link"><a href="https://research.swtch.com/interfaces" target="_blank">research.swtch.com/interfaces</a></p><p class="link"><a href="https://golang.org/doc/effective_go#interfaces_and_types" target="_blank">golang.org/doc/effective_go#interfaces_and_types</a></p>
+      
+      <span class="pagenumber">38</span>
+      </article>
+  
+  
+  
+      <article class="background" style="background-image: url(&#39;images/slide-back.png&#39;)">
+      
+        <h3>Summary</h3>
+        <ul>
+<li>Interfaces are one of the most powerful concepts in Go</li>
+<li>Improve readability, re-usability, and testing</li>
+<li>Implicitly satisfied interfaces increase flexibility</li>
+<li>Allow modeling complex scenarios through behaviour</li>
+</ul>
+
+      
+      <span class="pagenumber">39</span>
+      </article>
+  
+  
+  
+      <article class="background" style="background-image: url(&#39;images/slide-back.png&#39;)">
+      
+        <h3>Powerful Command-Line Applications in Go</h3>
+        
+<div class="image">
+  <img src="./the_power_go_interfaces_files/rggo.jpg" width="300">
+</div>
+<p class="link"><a href="https://pragprog.com/titles/rggo/powerful-command-line-applications-in-go/" target="_blank">pragprog.com/titles/rggo/powerful-command-line-applications-in-go/</a></p><p class="link"><a href="https://devtalk.com/books/powerful-command-line-applications-in-go" target="_blank">devtalk.com/books/powerful-command-line-applications-in-go</a></p>
+      
+      <span class="pagenumber">40</span>
+      </article>
+  
+  
+
+      <article class="background" style="background-image: url(&#39;images/title-back.png&#39;)">
+        <h3>Thank you</h3>
+        
+          <div class="presenter">
+            
+  
+  <p>
+    Ricardo Gerardi
+  </p>
+  
+
+  
+  <p>
+    Powerful Command-Line Applications in Go, Author
+  </p>
+  
+
+  
+  <p>
+    Senior Automation Consultant, Red Hat
+  </p>
+  
+<p class="link"><a href="http://twitter.com/ricardogerardi" target="_blank">@ricardogerardi</a></p>
+          </div>
+        
+      </article>
+
+    <div class="slide-area" id="prev-slide-area"></div><div class="slide-area" id="next-slide-area"></div></section>
+
+    <div id="help" style="display: none;">
+      Use the left and right arrow keys or click the left and right
+      edges of the page to navigate between slides.<br>
+      (Press 'H' or navigate to hide this message.)
+    </div>
+
+    
+    <script src="./the_power_go_interfaces_files/play.js"></script>
+    
+
+    <script>
+      (function() {
+        
+        if (window["location"] && window["location"]["hostname"] == "talks.golang.org") {
+          var ga = document.createElement("script"); ga.type = "text/javascript"; ga.async = true;
+          ga.src = ("https:" == document.location.protocol ? "https://ssl" : "http://www") + ".google-analytics.com/ga.js";
+          var s = document.getElementsByTagName("script")[0]; s.parentNode.insertBefore(ga, s);
+        }
+      })();
+    </script>
+  
+
+<link rel="stylesheet" type="text/css" href="./the_power_go_interfaces_files/css"><link rel="stylesheet" type="text/css" href="./the_power_go_interfaces_files/styles.css"></body></html>
